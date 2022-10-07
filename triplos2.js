@@ -8,7 +8,7 @@ document.getElementById('btn-calcular').addEventListener('click', ()=>{
     const operadoresRegEx = /[+*\-=\(\)\/]/g;
 
 
-    const ejecucionParentesis = evaluacionParentesis(expresion, operadoresRegEx, 
+    const ejecucionParentesis = calculoTriplos(expresion, operadoresRegEx, 
                                 operadoresIzqDer, operadoresDerIzq, indiceMemoria);
 
     expresion = expresion.replace(ejecucionParentesis[0],ejecucionParentesis[1]); 
@@ -18,9 +18,9 @@ document.getElementById('btn-calcular').addEventListener('click', ()=>{
 });
 
 
-function evaluacionParentesis(expresion, operadoresRegEx, operadoresIzqDer, 
+function calculoTriplos(expresion, operadoresRegEx, operadoresIzqDer, 
                               operadoresDerIzq, indiceMemoria){
-    let original = expresion;
+    let expresionOriginalActual = expresion;
     let arrResultado = new Array();
 
     while(expresion.includes('(') && expresion.includes(')')){
@@ -53,7 +53,7 @@ function evaluacionParentesis(expresion, operadoresRegEx, operadoresIzqDer,
             }
         }
 
-        const ejecucionParentesis = evaluacionParentesis(arregloVarsOps.slice(
+        const ejecucionParentesis = calculoTriplos(arregloVarsOps.slice(
                                         arregloVarsOps.indexOf('(') + 1,iUltimaCerr_PrimerApert).join(''),
                                         operadoresRegEx, operadoresIzqDer, operadoresDerIzq, indiceMemoria);
         expresion = expresion.replace(`(${ejecucionParentesis[0]})`,ejecucionParentesis[1]); 
@@ -93,7 +93,7 @@ function evaluacionParentesis(expresion, operadoresRegEx, operadoresIzqDer,
         }
     });
 
-    return [original, arregloVarsOps.join(''), indiceMemoria, arrResultado];
+    return [expresionOriginalActual, arregloVarsOps.join(''), indiceMemoria, arrResultado];
 }
 
 function conversion_ExpresionArreglo(expresion, operadoresRegEx){
