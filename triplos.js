@@ -18,12 +18,9 @@ document.getElementById('btn-calcular').addEventListener('click', ()=>{
                 indiceMemoria = ejecucionParentesis[2];
                 arrResultados = arrResultados.concat(ejecucionParentesis[3]);
             }
-
-            arrResultados = arrResultados.concat(
-                calcularAgrupaciones(operadoresIzqDer, operadoresDerIzq, expresion, operadoresRegEx, indiceMemoria)[3]);
-
-
-
+            const ejecucionSinParentesis = calcularAgrupaciones(operadoresIzqDer, operadoresDerIzq, 
+                                                           expresion, operadoresRegEx, indiceMemoria);
+            arrResultados = arrResultados.concat(ejecucionSinParentesis[3]);
 
         } else if(expresion.includes('(')){
             alert('La expresión es invalida debido a que dejo un "(" sin cerrar');
@@ -46,6 +43,7 @@ function calcularAgrupaciones(operadoresIzqDer, operadoresDerIzq, expresion, ope
         arregloVarsOps.push(arregloOperadores[i]);
     }
 
+
     operadoresIzqDer.forEach((operador) => {
         while(arregloVarsOps.includes(operador)) {
             indiceMemoria++;
@@ -66,7 +64,7 @@ function calcularAgrupaciones(operadoresIzqDer, operadoresDerIzq, expresion, ope
             indiceMemoria++;
             let indice = arregloVarsOps.lastIndexOf(operador);
             arrResultado.push(
-                [arregloVarsOps[indice - 1], arregloVarsOps[indice], arregloVarsOps[indice + 1]], `[${indiceMemoria}]`);
+                [arregloVarsOps[indice - 1], arregloVarsOps[indice], arregloVarsOps[indice + 1], `[${indiceMemoria}]`]);
 
             arregloVarsOps[indice - 1] = '';
             arregloVarsOps[indice] = `[${indiceMemoria}]`;
@@ -76,10 +74,7 @@ function calcularAgrupaciones(operadoresIzqDer, operadoresDerIzq, expresion, ope
         }
     });
 
-    return [`(${expresion})`, ...arregloVarsOps, indiceMemoria, arrResultado];
-
-
-
+    return [`(${expresion})`, arregloVarsOps.join(''), indiceMemoria, arrResultado];
 }
 
 
