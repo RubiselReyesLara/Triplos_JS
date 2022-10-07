@@ -13,7 +13,7 @@ document.getElementById('btn-calcular').addEventListener('click', ()=>{
 
     expresion = expresion.replace(ejecucionParentesis[0],ejecucionParentesis[1]); 
     indiceMemoria = ejecucionParentesis[2];
-    arrResultados = arrResultado.concat(ejecucionParentesis[3]);
+    arrResultados = arrResultados.concat(ejecucionParentesis[3]);
 
 });
 
@@ -56,7 +56,7 @@ function evaluacionParentesis(expresion, operadoresRegEx, operadoresIzqDer,
         const ejecucionParentesis = evaluacionParentesis(arregloVarsOps.slice(
                                         arregloVarsOps.indexOf('(') + 1,iUltimaCerr_PrimerApert).join(''),
                                         operadoresRegEx, operadoresIzqDer, operadoresDerIzq, indiceMemoria);
-        expresion = expresion.replace(ejecucionParentesis[0],ejecucionParentesis[1]); 
+        expresion = expresion.replace(`(${ejecucionParentesis[0]})`,ejecucionParentesis[1]); 
         indiceMemoria = ejecucionParentesis[2];
         arrResultado = arrResultado.concat(ejecucionParentesis[3]);
     }
@@ -93,7 +93,7 @@ function evaluacionParentesis(expresion, operadoresRegEx, operadoresIzqDer,
         }
     });
 
-    return [`(${original})`, arregloVarsOps.join(''), indiceMemoria, arrResultado];
+    return [original, arregloVarsOps.join(''), indiceMemoria, arrResultado];
 }
 
 function conversion_ExpresionArreglo(expresion, operadoresRegEx){
