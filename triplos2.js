@@ -1,47 +1,12 @@
 document.getElementById('btn-calcular').addEventListener('click', ()=>{
     const operadoresIzqDer = ['/', '*'];
     const operadoresDerIzq = ['+', '-', '='];
-    let arrResultados = new Array();
+    let arrResultado = new Array();
     let indiceMemoria = 0;
 
     let expresion = document.getElementById('input-expresion').value.replace(/ /g, '');
     const operadoresRegEx = /[+*\-=\(\)\/]/g;
 
-    if(expresion.length > 0 && operadoresRegEx.test(expresion)){
-
-        if(expresion.includes('(') && expresion.includes(')')){
-            while(expresion.includes('(')) {
-                let grupoParentesis = expresion.substring(expresion.lastIndexOf('(') + 1, expresion.indexOf(')'));
-                const ejecucionParentesis = calculoTriplos(
-                    operadoresIzqDer, operadoresDerIzq, grupoParentesis, operadoresRegEx, indiceMemoria);
-                expresion = expresion.replace(ejecucionParentesis[0], ejecucionParentesis[1]); 
-                indiceMemoria = ejecucionParentesis[2];
-                arrResultados = arrResultados.concat(ejecucionParentesis[3]);
-            }
-
-            const ejecucionSinParentesis = calculoTriplos(operadoresIzqDer, operadoresDerIzq, 
-                                                           expresion, operadoresRegEx, indiceMemoria);
-            arrResultados = arrResultados.concat(ejecucionSinParentesis[3]);
-            console.log('albarn');
-
-        } else if(expresion.includes('(')){
-            alert('La expresión es invalida debido a que dejo un "(" sin cerrar');
-
-        } else {
-            const ejecucion = calculoTriplos(operadoresIzqDer, operadoresDerIzq, 
-                expresion, operadoresRegEx, indiceMemoria);
-            arrResultados = arrResultados.concat(ejecucion[3]);
-            console.log('albarn');
-        }
-
-    } else {
-        alert('Disculpe, dejo un espacio en blanco, o ingreso una expresión NO válida')
-    }
-});
-
-function calculoTriplos(operadoresIzqDer, operadoresDerIzq, expresion, operadoresRegEx, indiceMemoria){
-    // FALTA VERIFICAR SI SOLO HAY UNA VARIABLE O VALOR DENTRO DE PARENTESIS '''''''''''''''''''''''''
-    let arrResultado = new Array();
     let arregloVariables = expresion.split(operadoresRegEx); // Obtengo las vars (a, b, c)
     let arregloOperadores = expresion.match(operadoresRegEx).concat(['']); // Obtengo los ops (+, -, ...)
     let arregloVarsOps = new Array();
@@ -51,6 +16,45 @@ function calculoTriplos(operadoresIzqDer, operadoresDerIzq, expresion, operadore
         arregloVarsOps.push(arregloOperadores[i]);
     }
 
+    evaluacionParentesis(arregloVarsOps, arrResultado, operadoresIzqDer, operadoresDerIzq, indiceMemoria);
+
+});
+
+function evaluacionParentesis(arregloVarsOps, arrResultado, operadoresIzqDer, operadoresDerIzq, indiceMemoria){
+    while(arregloVarsOps.includes('(') && arregloVarsOps.includes(')')){
+        let contadorAperturas = 0; // Aperturas de parentesis
+        let contadorCerraduras = 0; // Cerraduras de parentesis
+        let iterador = 0; 
+
+        // Verifica los primeros parentesis antes de una cerradura ((( ->)
+        while(arregloVarsOps[iterador] !=')'){
+            if(arregloVarsOps[iterador] == '('){
+                contadorAperturas++;
+            }
+            iterador++;
+        }
+
+        let iUltimaCerr_PrimerApert = 0;
+        let continuarIterando = true;
+
+        while(continuarIterando) {
+            if(arregloVarsOps[iterador] == ')'){
+                contadorCerraduras++;
+                iterador++;
+            } else if(contadorAperturas == contadorCerraduras){
+                iUltimaCerr_PrimerApert = iterador - 1;
+                continuarIterando = false;
+            } else{
+                iterador++;
+            }
+        }
+
+        const ejecucionParentesis = evaluacionParentesis(arregloVarsOps.slice(
+                                        arregloVarsOps.indexOf('(') + 1,iUltimaCerr_PrimerApert),
+                                        arrResultado, operadoresIzqDer, operadoresDerIzq, indiceMemoria);
+        arrResultado = arrResultado.concat(ejecucionParentesis[3]);
+    }
+     
     operadoresIzqDer.forEach((operador) => {
         while(arregloVarsOps.includes(operador)) {
             indiceMemoria++;
@@ -81,7 +85,7 @@ function calculoTriplos(operadoresIzqDer, operadoresDerIzq, expresion, operadore
         }
     });
 
-    return [`(${expresion})`, arregloVarsOps.join(''), indiceMemoria, arrResultado];
+    return [`(${arregloVarsOps.join('')})`, arregloVarsOps.join(''), indiceMemoria, arrResultado];
+
+
 }
-
-
