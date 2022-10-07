@@ -1,27 +1,31 @@
 document.getElementById('btn-calcular').addEventListener('click', ()=>{
     const operadoresIzqDer = ['/', '*'];
     const operadoresDerIzq = ['+', '-', '='];
-    let arrResultado = new Array();
+    let arrResultados = new Array();
     let indiceMemoria = 0;
 
     let expresion = document.getElementById('input-expresion').value.replace(/ /g, '');
     const operadoresRegEx = /[+*\-=\(\)\/]/g;
 
-    let arregloVariables = expresion.split(operadoresRegEx); // Obtengo las vars (a, b, c)
-    let arregloOperadores = expresion.match(operadoresRegEx).concat(['']); // Obtengo los ops (+, -, ...)
-    let arregloVarsOps = new Array();
 
-    for(let i = 0; i < arregloVariables.length; i++){ // Conbino las variables con los operadores
-        arregloVarsOps.push(arregloVariables[i]);
-        arregloVarsOps.push(arregloOperadores[i]);
-    }
+    const ejecucionParentesis = evaluacionParentesis(expresion, operadoresRegEx, 
+                                operadoresIzqDer, operadoresDerIzq, indiceMemoria);
 
-    evaluacionParentesis(arregloVarsOps, arrResultado, operadoresIzqDer, operadoresDerIzq, indiceMemoria);
+    expresion = expresion.replace(ejecucionParentesis[0],ejecucionParentesis[1]); 
+    indiceMemoria = ejecucionParentesis[2];
+    arrResultados = arrResultado.concat(ejecucionParentesis[3]);
 
 });
 
-function evaluacionParentesis(arregloVarsOps, arrResultado, operadoresIzqDer, operadoresDerIzq, indiceMemoria){
-    while(arregloVarsOps.includes('(') && arregloVarsOps.includes(')')){
+
+function evaluacionParentesis(expresion, operadoresRegEx, operadoresIzqDer, 
+                              operadoresDerIzq, indiceMemoria){
+    let original = expresion;
+    let arrResultado = new Array();
+
+    while(expresion.includes('(') && expresion.includes(')')){
+        const arregloVarsOps = conversion_ExpresionArreglo(expresion, operadoresRegEx);
+
         let contadorAperturas = 0; // Aperturas de parentesis
         let contadorCerraduras = 0; // Cerraduras de parentesis
         let iterador = 0; 
@@ -50,11 +54,15 @@ function evaluacionParentesis(arregloVarsOps, arrResultado, operadoresIzqDer, op
         }
 
         const ejecucionParentesis = evaluacionParentesis(arregloVarsOps.slice(
-                                        arregloVarsOps.indexOf('(') + 1,iUltimaCerr_PrimerApert),
-                                        arrResultado, operadoresIzqDer, operadoresDerIzq, indiceMemoria);
+                                        arregloVarsOps.indexOf('(') + 1,iUltimaCerr_PrimerApert).join(''),
+                                        operadoresRegEx, operadoresIzqDer, operadoresDerIzq, indiceMemoria);
+        expresion = expresion.replace(ejecucionParentesis[0],ejecucionParentesis[1]); 
+        indiceMemoria = ejecucionParentesis[2];
         arrResultado = arrResultado.concat(ejecucionParentesis[3]);
     }
      
+    let arregloVarsOps = conversion_ExpresionArreglo(expresion, operadoresRegEx);
+
     operadoresIzqDer.forEach((operador) => {
         while(arregloVarsOps.includes(operador)) {
             indiceMemoria++;
@@ -85,7 +93,17 @@ function evaluacionParentesis(arregloVarsOps, arrResultado, operadoresIzqDer, op
         }
     });
 
-    return [`(${arregloVarsOps.join('')})`, arregloVarsOps.join(''), indiceMemoria, arrResultado];
+    return [`(${original})`, arregloVarsOps.join(''), indiceMemoria, arrResultado];
+}
 
-
+function conversion_ExpresionArreglo(expresion, operadoresRegEx){
+    const arregloVariables = expresion.split(operadoresRegEx); // Obtengo las vars (a, b, c)
+    const arregloOperadores = expresion.match(operadoresRegEx).concat(['']); // Obtengo los ops (+, -, ...)
+    const arregloVarsOps = new Array();
+    
+    for(let i = 0; i < arregloVariables.length; i++){ // Conbino las variables con los operadores
+        arregloVarsOps.push(arregloVariables[i]);
+        arregloVarsOps.push(arregloOperadores[i]);
+    }
+    return arregloVarsOps;
 }
