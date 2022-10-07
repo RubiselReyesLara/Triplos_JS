@@ -7,7 +7,6 @@ document.getElementById('btn-calcular').addEventListener('click', ()=>{
     let expresion = document.getElementById('input-expresion').value.replace(/ /g, '');
     const operadoresRegEx = /[+*\-=\(\)\/]/g;
 
-
     const ejecucionParentesis = calculoTriplos(expresion, operadoresRegEx, 
                                 operadoresIzqDer, operadoresDerIzq, indiceMemoria);
 
@@ -24,34 +23,21 @@ function calculoTriplos(expresion, operadoresRegEx, operadoresIzqDer,
     let arrResultado = new Array();
 
     while(expresion.includes('(') && expresion.includes(')')){
-        const arregloVarsOps = conversion_ExpresionArreglo(expresion, operadoresRegEx);
+        const arregloVarsOps = conversion_Exp_Arr(expresion, operadoresRegEx);
 
-        let contadorAperturas = 0; // Aperturas de parentesis
-        let contadorCerraduras = 0; // Cerraduras de parentesis
-        let iterador = 0; 
+        let contadorAperturas = 1; // Aperturas de parentesis
+        let iterador = arregloVarsOps.indexOf('(') + 1;
 
-        // Verifica los primeros parentesis antes de una cerradura ((( ->)
-        while(arregloVarsOps[iterador] !=')'){
+        while(contadorAperturas > 0){
             if(arregloVarsOps[iterador] == '('){
-                contadorAperturas++;
+                    contadorAperturas++;
+            } else if(arregloVarsOps[iterador] == ')'){
+                contadorAperturas--;
             }
             iterador++;
         }
 
-        let iUltimaCerr_PrimerApert = 0;
-        let continuarIterando = true;
-
-        while(continuarIterando) {
-            if(arregloVarsOps[iterador] == ')'){
-                contadorCerraduras++;
-                iterador++;
-            } else if(contadorAperturas == contadorCerraduras){
-                iUltimaCerr_PrimerApert = iterador - 1;
-                continuarIterando = false;
-            } else{
-                iterador++;
-            }
-        }
+        let iUltimaCerr_PrimerApert = iterador - 1;
 
         const ejecucionParentesis = calculoTriplos(arregloVarsOps.slice(
                                         arregloVarsOps.indexOf('(') + 1,iUltimaCerr_PrimerApert).join(''),
@@ -61,7 +47,7 @@ function calculoTriplos(expresion, operadoresRegEx, operadoresIzqDer,
         arrResultado = arrResultado.concat(ejecucionParentesis[3]);
     }
      
-    let arregloVarsOps = conversion_ExpresionArreglo(expresion, operadoresRegEx);
+    let arregloVarsOps = conversion_Exp_Arr(expresion, operadoresRegEx);
 
     operadoresIzqDer.forEach((operador) => {
         while(arregloVarsOps.includes(operador)) {
@@ -96,14 +82,20 @@ function calculoTriplos(expresion, operadoresRegEx, operadoresIzqDer,
     return [expresionOriginalActual, arregloVarsOps.join(''), indiceMemoria, arrResultado];
 }
 
-function conversion_ExpresionArreglo(expresion, operadoresRegEx){
+function conversion_Exp_Arr(expresion, operadoresRegEx){
     const arregloVariables = expresion.split(operadoresRegEx); // Obtengo las vars (a, b, c)
-    const arregloOperadores = expresion.match(operadoresRegEx).concat(['']); // Obtengo los ops (+, -, ...)
-    const arregloVarsOps = new Array();
-    
-    for(let i = 0; i < arregloVariables.length; i++){ // Conbino las variables con los operadores
-        arregloVarsOps.push(arregloVariables[i]);
-        arregloVarsOps.push(arregloOperadores[i]);
+
+    // CORREGIR QUE NO ACEPTA CUANDO NO VENGAN CADENAS
+    if(operadoresRegEx.test(expresion)){
+        const arregloOperadores = expresion.match(operadoresRegEx).concat(['']); // Obtengo los ops (+, -, ...)
+        const arregloVarsOps = new Array();
+        
+        for(let i = 0; i < arregloVariables.length; i++){ // Conbino las variables con los operadores
+            arregloVarsOps.push(arregloVariables[i]);
+            arregloVarsOps.push(arregloOperadores[i]);
+        }
+        return arregloVarsOps; // Retorna un arreglo de la expresion
+    } else {
+        return [expresion]; // Retorna la expresión en arreglo
     }
-    return arregloVarsOps;
 }
