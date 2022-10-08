@@ -14,8 +14,8 @@ document.getElementById('btn-calcular').addEventListener('click', ()=>{
     indiceMemoria = ejecucionParentesis[2];
     arrResultados = arrResultados.concat(ejecucionParentesis[3]);
 
+    generarTabla(arrResultados);
 });
-
 
 function calculoTriplos(expresion, operadoresRegEx, operadoresIzqDer, 
                               operadoresDerIzq, indiceMemoria){
@@ -49,37 +49,58 @@ function calculoTriplos(expresion, operadoresRegEx, operadoresIzqDer,
      
     let arregloVarsOps = conversion_Exp_Arr(expresion, operadoresRegEx);
 
-    operadoresIzqDer.forEach((operador) => {
-        while(arregloVarsOps.includes(operador)) {
-            indiceMemoria++;
-            let indice = arregloVarsOps.indexOf(operador);
-            arrResultado.push(
+    const multDiv = new RegExp(/[*\/]/, 'i');
+    const sumRes = new RegExp(/[+-]/, 'i');
+    const igual = new RegExp(/[=]/, 'i');
+
+    const resultadoMultDiv = generarResultados(multDiv, arregloVarsOps, indiceMemoria, arrResultado);
+
+    const resultadoSumRes = generarResultados(sumRes, resultadoMultDiv[0], resultadoMultDiv[1], resultadoMultDiv[2]);
+
+    const resultadoIgualacion = generarResultados(igual, resultadoSumRes[0], resultadoSumRes[1], resultadoSumRes[2]);
+
+    return [expresionOriginalActual, resultadoIgualacion[0], resultadoIgualacion[1], resultadoIgualacion[2]];
+}
+
+
+function generarResultados(expReg, arregloVarsOps, indiceMemoria, arrResultado){
+    while(expReg.test(arregloVarsOps)){
+        let operador = arregloVarsOps.toString().match(expReg);
+        indiceMemoria++;
+        let indice = arregloVarsOps.indexOf(operador[0]);
+        arrResultado.push(
                 [arregloVarsOps[indice - 1], arregloVarsOps[indice], arregloVarsOps[indice + 1], `[${indiceMemoria}]`]);
+        
+        arregloVarsOps[indice - 1] = '';
+        arregloVarsOps[indice] = `[${indiceMemoria}]`;
+        arregloVarsOps[indice + 1] = '';
+        arregloVarsOps = arregloVarsOps.filter(elemento => String(elemento).trim());
+        console.log(arregloVarsOps);
+    }
+    return [arregloVarsOps, indiceMemoria, arrResultado];
+}
 
-            arregloVarsOps[indice - 1] = '';
-            arregloVarsOps[indice] = `[${indiceMemoria}]`;
-            arregloVarsOps[indice + 1] = '';
-            arregloVarsOps = arregloVarsOps.filter(elemento => String(elemento).trim());
-            console.log(arregloVarsOps);
-        }
-    });
 
-    operadoresDerIzq.forEach((operador) => {
-        while(arregloVarsOps.includes(operador)){
-            indiceMemoria++;
-            let indice = arregloVarsOps.lastIndexOf(operador);
-            arrResultado.push(
-                [arregloVarsOps[indice - 1], arregloVarsOps[indice], arregloVarsOps[indice + 1], `[${indiceMemoria}]`]);
+function generarTabla(arrResultados = new Array()){
+    const tabla = document.getElementById('tabla-resultados');
+    tabla.innerHTML = ''; // Limpiamos lo que estaba en la tabla
 
-            arregloVarsOps[indice - 1] = '';
-            arregloVarsOps[indice] = `[${indiceMemoria}]`;
-            arregloVarsOps[indice + 1] = '';
-            arregloVarsOps = arregloVarsOps.filter(elemento => String(elemento).trim());
-            console.log(arregloVarsOps);
-        }
-    });
+    const encabezado = tabla.createTHead();
+    const cuerpo = tabla.createTBody();
 
-    return [expresionOriginalActual, arregloVarsOps.join(''), indiceMemoria, arrResultado];
+    const filaEncabezado = encabezado.insertRow(0); 
+    filaEncabezado.insertCell(0).innerHTML = 'Operación';
+    filaEncabezado.insertCell(1).innerHTML = 'Argumento 1';
+    filaEncabezado.insertCell(2).innerHTML = 'Argumento 2';
+    filaEncabezado.insertCell(3).innerHTML = '';
+    
+    for(let i = 0; i < arrResultados.length; i++){
+        const filaCuerpo = cuerpo.insertRow(i);
+        filaCuerpo.insertCell(0).innerHTML = arrResultados[i][1];
+        filaCuerpo.insertCell(1).innerHTML = arrResultados[i][0];
+        filaCuerpo.insertCell(2).innerHTML = arrResultados[i][2];
+        filaCuerpo.insertCell(3).innerHTML = arrResultados[i][3];
+    }
 }
 
 function conversion_Exp_Arr(expresion, operadoresRegEx){
