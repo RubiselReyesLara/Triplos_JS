@@ -4,18 +4,25 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="estilo.css">
     <title>Triplos</title>
 </head>
 <body>
-    <div>
-        <h3>Triplos</h3>
-        <input type="text" placeholder="x = a / b *(12 + 4)" value= 'x = a + b *(a * b + (b / a + c))' id="input-expresion"><button id="btn-calcular">Calcular</button>
-        <table id="tabla-resultados">
+    <div id="caja-principal">
+        <div id='div-titulo'>
+            <h3>Cálculo de los Triplos de una expresión</h3><h5>por Rubisel RL</h5>
+        </div>
+
+        <div id="div-expresion">
+            <input type="text" placeholder="Escriba aquí una expresión (Ej. X = (A + B))" value= 'x = a + b *(a * b + (b / a + c))' id="input-expresion"><button id="btn-calcular">Calcular</button>
+        </div>
             
-        </table>
+        <div id="caja-tabla-resultados">
+            <table id="tabla-resultados">
+            
+            </table>
+        </div>
     </div>
-
-
     <script src="triplos.js"></script>
 </body>
 </html>

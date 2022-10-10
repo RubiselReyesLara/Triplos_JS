@@ -21,7 +21,7 @@ function calculoTriplos(expresion, operadoresRegEx, indiceMemoria){
     let arregloVarsOps = new Array();
     let arrResultado = new Array();
 
-    while(expresion.includes('(')){ // SI SE TIENE UNA OPERACION CON PARENTESIS
+    while(expresion.includes('(') && expresion.includes(')')){ // SI SE TIENE UNA OPERACION CON PARENTESIS
         
         arregloVarsOps = expresion.split(/(?=[+-/*=()])|(?<=[+-/*=()])/g); // Convertir expresion a arreglo
         let contadorAperturas = 1; // Aperturas de parentesis
@@ -106,6 +106,7 @@ function generarTabla(arrResultados = new Array()){
     TABLA.innerHTML = ''; // Limpiamos lo que estaba en la tabla
 
     const ENCABEZADO = TABLA.createTHead();
+    ENCABEZADO.setAttribute('id', 'encabezado-tabla');
     const CUERPO = TABLA.createTBody();
 
     const FILA_ENCABEZADO = ENCABEZADO.insertRow(0); 
